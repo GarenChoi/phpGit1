@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>토론장</title>
     <link href="https://webfontworld.github.io/BMJua/BMJua.css" rel="stylesheet">
     <?php
         include "../include/style.php";
@@ -222,7 +222,7 @@
                         <figure class="ask__img">
                             <img src="../img/<?=$askInfo{'youPhoto'}?>" alt="이미지">
                         </figure>
-                        <div class="ask__contents">
+                        <div class="ask__contents"><?=$askInfo['boardID']?>
                             <a href="boardTAnswer.php?boardID=<?=$askInfo['boardID']?>&youNickName=<?=$askInfo['youNickName']?>">
                                 <div class="ask__title"><?=$askInfo{'boardTitle'}?></div>
                                 <div class="ask__desc"><?=$askInfo{'boardContents'}?></div>
@@ -239,8 +239,7 @@
                 <?php   
                     $getNickName = $_GET['youNickName'];
                     $boardID = $_GET['boardID'];
-                    $sql = "SELECT t.boardID, t.answerContents, t.youNickName, m.youPhoto, t.regTime FROM teamBoardTAnswer t JOIN myTeam m ON(t.memberID = m.memberID) WHERE boardID = {$boardID} ORDER BY regTime ASC";
-                    $result2 = $connect -> query($sql);
+                    
                     forEach($result2 as $answerInfo){ 
                     
                     if($getNickName == $answerInfo['youNickName']){
@@ -283,7 +282,41 @@
         </main>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
+
+        
+
+
+        function answerData(){
+            let answerData = $("textarea.answerContents").text();
+            let boardID = $(".ask__contents").text();
+            $.ajax({
+                url: "boardTAnswerSave.php",
+                method: "POST",
+                data: {"answerContents": answerContents, "boardID":  boardID},
+                dataType: "json",
+                success: function(data){
+                    console.log(data.answer);
+
+                },
+                error: function(request, status, error){
+                    console.log('request' + request);
+                    console.log('status' + status);
+                    console.log('error' + error);
+                }
+            })
+        }
+        
+        $("button.answer__btn").click(function(){
+            answerData();
+        })
+
+
+
+
+
+        //본인 글 오른쪽 정렬
         let nickName = "<?=$_SESSION['youNickName']?>"
         // console.log(nickName)
         var answerName = document.querySelectorAll(".answer__name");

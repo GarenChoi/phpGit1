@@ -8,8 +8,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../css/reset.css">
+    <title>놀이터</title>
+    <link href="https://webfontworld.github.io/BMJua/BMJua.css" rel="stylesheet">
     <?php
         include "../include/style.php";
     ?>
@@ -24,10 +24,6 @@
             justify-content: end;
             align-items: end;
             height: 50px;
-        }
-        .header h2 {
-            font-size: 24px;
-            font-weight: 800;
         }
         fieldset {
             display: flex;
@@ -128,14 +124,6 @@
         .room .roomInfo > span {
             margin-left: 3px;
         }
-        .room .roomInfo .Like {
-            margin-top: 4px;
-            display: inline-block;
-            background-image: url("../img/Like.jpg");
-            background-repeat: no-repeat;
-            width: 15px;
-            height: 15px;
-        }
         .room span span {
             margin-left: 5px;
             font-size: 14px;
@@ -149,14 +137,20 @@
             margin-top: 5px;
             border-radius: 10px;
         }
+        .btn-like .heart-shape {
+            display: inline;
+            color: red;
+        }
+        .btn-like {
+            border: none;
+            background-color: inherit;
+        }
     </style>
 </head>
 <body>
-
     <?php
         include "../include/header.php";
     ?>
-
     <div class="wrap">
         <nav id="nav">
             <ul>
@@ -170,7 +164,7 @@
                 <fieldset>
                     <legend class="ir_so">게시판 검색 영역</legend>
                     <div>
-                        <input type="search" name="searchKeyword" class="search-form" placeholder="search" aria-label="search" required>
+                        <input type="search" name="searchKeyword" class="search-form" placeholder="search" aria-label="search" requierd >
                     </div>
                     <div>
                         <select name="searchOption" class="search-option">
@@ -186,9 +180,10 @@
             </form>
         </div>
 <!-- //header include -->
-        
     <main id="main">
     <?php
+    $memberID = $_SESSION['memberID'];
+
     //b.boardID, b.boardTitle, m.youName, b.regTime, b.boardView
     if(isset($_GET['page'])){
         $page = (int) $_GET['page'];
@@ -200,6 +195,9 @@
     $pageLimit = ($pageView * $page) - $pageView;
     $sql = "SELECT b.boardID, b.boardTitle, b.boardMeet, b.boardContents, m.youNickName, b.regTime, b.boardLike FROM teamBoardN b JOIN myTeam m ON(m.memberID = b.memberID) ORDER BY boardID DESC LIMIT {$pageLimit}, {$pageView}";
     $result = $connect -> query($sql);
+    
+    $SIBAL = "";
+
     if($result){
         $count = $result -> num_rows;
         if($count > 0){
@@ -212,15 +210,37 @@
             <p><?=$boardInfo['boardContents']?></p>
             <figure class="roomInfo">
                 <a href="" class="people"><img src="../img/People.jpg" alt=""></a>
-                <span><img src="../img/Chat.jpg" alt=""><span>23</span></span>
-                <span><a href="#" class="Like"></a><span><?=$boardInfo['boardLike']?></span> </span>
+                <span><img src="../img/Chat.jpg" alt=""><span></span></span>
+                <button type="button" class="btn-like" data-name="<?=$boardInfo['boardID']?>">
+
+        <?php   if($memberID){
+
+                    $sqlH = "SELECT * FROM heart WHERE memberID = $memberID";
+                    $resultH = $connect -> query($sqlH);
+                    foreach($resultH as $heartInfo){ 
+                        if($heartInfo['boardID'] == $boardInfo['boardID']){
+                            $SIBAL = 'true';
+                            break;
+                        } else {
+                            $SIBAL = 'false';
+                        } 
+                    } ?>
+            <?php   if($SIBAL == 'true'){?>
+                        <span class="heart_shape">♥</span><span class="likeCount"><?=$boardInfo['boardLike']?></span></span>
+            <?php   } else { ?>
+                        <span class="heart_shape">♡</span><span class="likeCount"><?=$boardInfo['boardLike']?></span></span>
+            <?php   } 
+                } else {  ?>
+                    <span class="heart_shape">♡</span><span class="likeCount"><?=$boardInfo['boardLike']?></span></span>
+        <?php   } ?>
+            
+                </button>
             </figure>
         </article>
         <?php }
         }
     }
 ?>
-
 </main>
         <div>
             <a href="boardWrite.php" class="write">글쓰기</a>
@@ -241,12 +261,53 @@
             </ul>
         </div>
     </div>
-    <script>
-        document.querySelectorAll(".Like").forEach((el,i) => {
-            el.addEventListener("click", e => {
-                el.style.background = "url('../img/Chat.jpg')";
-            })
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+var memberID = "<?=$_SESSION['memberID']?>"
+
+if(!memberID){
+    $(".btn-like").click(function(){
+        alert("로그인 후 이용해주세요!");
+    })
+    
+} else {
+
+    $(".btn-like").on("click", function(e) {
+        var button = $(e.currentTarget || e.target)
+        var likeCount = button.find(".likeCount")
+        var heartShape = button.find(".heart_shape")
+        // console.log(heartShape);
+        $.ajax({
+            type : "POST",
+            url : "likeCheck.php",
+            data : {"articleId": button.data('name'), "memberID": memberID},
+            dataType : "json",
+            success : function(data){
+                var addCount = (data.data == "like" ? 1 : data.data == "unlike" ? -1 : 0)
+                likeCount.text(+likeCount.text() + addCount)
+                heartShape.text(data.data == "like" ? "♥" : data.data == "unlike" ? "♡" : "♡")
+            },
+            error : function(request, status, error){
+                        console.log("request" + request);
+                        console.log("status" + status);
+                        console.log("error" + error);
+            }
         })
-    </script>
+    })
+    $(".btn-like").each(function(idx, el) {
+        var button = $(el)
+        var heartShape = button.find(".heart_shape")
+        $.get("likeCheck.php", {
+            getLikedByCode: button.data('name')
+        }, function(res) {
+            if (res == "unliked") {
+                    heartShape.find("i").removeClass("fas").addClass("far")
+                } else if (res == "liked") {
+                    heartShape.find("i").removeClass("far").addClass("fas")
+                }
+        })
+    })
+}
+</script>
 </body>
 </html>

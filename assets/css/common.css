@@ -155,6 +155,22 @@ ir_so : 대체 텍스트가 아닌 접근성을 위한 숨김 텍스트를 제�
 .mt50 {margin-top: 50px !important;}
 .mt100 {margin-top: 100px !important;}
 
+.ml0 {margin-left: 0 !important;}
+.ml10 {margin-left: 10px !important;}
+.ml20 {margin-left: 20px !important;}
+.ml30 {margin-left: 30px !important;}
+.ml40 {margin-left: 40px !important;}
+.ml50 {margin-left: 50px !important;}
+.ml100 {margin-left: 100px !important;}
+
+.mr0 {margin-right: 0 !important;}
+.mr10 {margin-right: 10px !important;}
+.mr20 {margin-right: 20px !important;}
+.mr30 {margin-right: 30px !important;}
+.mr40 {margin-right: 40px !important;}
+.mr50 {margin-right: 50px !important;}
+.mr100 {margin-right: 100px !important;}
+
 .mb0 {margin-bottom: 0 !important;}
 .mb10 {margin-bottom: 10px !important;}
 .mb20 {margin-bottom: 20px !important;}

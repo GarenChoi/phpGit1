@@ -22,7 +22,7 @@
                 if($fileExtenstion == "jpg" || $fileExtenstion == "jpeg" || $fileExtenstion == "png" || $fileExtenstion == "gif"){
                     $ImgDir = "../img/";
                     $ImgName = "Img_".time().rand(1,99999)."."."{$fileExtenstion}";
-                    $sql = "UPDATE myTeam SET youPhoto = '{$ImgName}'";
+                    $sql = "UPDATE myTeam SET youPhoto = '{$ImgName}' WHERE memberID = '$memberID'";
                 } else {
                     echo "<script>alert('지원하는 이미지 파일 형식이 아닙니다. jpg, png, gif 사진 파일만 지원됩니다.'); history.back('1');</script>";
                 }

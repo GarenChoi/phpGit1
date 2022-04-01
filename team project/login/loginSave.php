@@ -19,7 +19,8 @@
             $count = $result -> num_rows;
 
             if($count == 0){
-                echo "<script>alert('이메일 또는 비밀번호가 잘못되었습니다. 다시 한번 확인해주세요!');history.back(1);</script>";
+                echo "<script>alert('이메일 또는 비밀번호가 잘못되었습니다. 다시 한번 확인해주세요!'); history.back()</script>";
+                
                 // msg("이메일 또는 비밀번호가 잘못되었습니다. 다시 한번 확인해주세요!");
             } else {
                 
